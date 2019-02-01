@@ -4,6 +4,8 @@ import org.apereo.cas.couchbase.core.CouchbaseClientFactory;
 import org.apereo.cas.support.events.service.CasRegisteredServiceLoadedEvent;
 import org.apereo.cas.util.serialization.StringSerializer;
 
+import com.couchbase.client.java.PersistTo;
+import com.couchbase.client.java.ReplicateTo;
 import com.couchbase.client.java.document.RawJsonDocument;
 import com.couchbase.client.java.query.N1qlQuery;
 import com.couchbase.client.java.query.N1qlQueryResult;
@@ -61,7 +63,7 @@ public class CouchbaseServiceRegistry extends AbstractServiceRegistry implements
         try (val stringWriter = new StringWriter()) {
             this.registeredServiceJsonSerializer.to(stringWriter, service);
             val document = RawJsonDocument.create(String.valueOf(service.getId()), 0, stringWriter.toString());
-            couchbase.getBucket().upsert(document, couchbase.getTimeout(), TimeUnit.MILLISECONDS);
+            couchbase.getBucket().upsert(document, PersistTo.MASTER, ReplicateTo.NONE, couchbase.getTimeout(), TimeUnit.MILLISECONDS);
             LOGGER.debug("Saved service [{}]", service.getName());
             publishEvent(new CouchbaseRegisteredServiceSavedEvent(this));
         }
