@@ -63,7 +63,7 @@ public class CouchbaseServiceRegistry extends AbstractServiceRegistry implements
         try (val stringWriter = new StringWriter()) {
             this.registeredServiceJsonSerializer.to(stringWriter, service);
             val document = RawJsonDocument.create(String.valueOf(service.getId()), 0, stringWriter.toString());
-            couchbase.getBucket().upsert(document, PersistTo.MASTER, ReplicateTo.NONE, couchbase.getTimeout(), TimeUnit.MILLISECONDS);
+            couchbase.getBucket().upsert(document, PersistTo.ONE, ReplicateTo.NONE, couchbase.getTimeout(), TimeUnit.MILLISECONDS);
             LOGGER.debug("Saved service [{}]", service.getName());
             publishEvent(new CouchbaseRegisteredServiceSavedEvent(this));
         }
